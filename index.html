@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Interest Rate Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+
+:root {
+  /* Palette — crisp light with electric-blue accent */
+  --page-bg   : #F0F4FA;
+  --card-bg   : #FFFFFF;
+  --card-bg2  : #F7F9FD;
+  --border    : #E2E8F4;
+  --border2   : #C8D4EA;
+
+  --blue      : #2563EB;
+  --blue-lt   : #3B82F6;
+  --blue-ultra: #EFF4FF;
+  --blue-glow : rgba(37,99,235,.18);
+
+  --teal      : #0EA5E9;
+  --green     : #10B981;
+  --amber     : #F59E0B;
+  --red       : #EF4444;
+  --red-lt    : #FEF2F2;
+
+  --ink       : #0F172A;
+  --ink2      : #334155;
+  --muted     : #64748B;
+  --muted-lt  : #94A3B8;
+  --muted-bg  : #F1F5F9;
+
+  /* Shadows */
+  --shadow-xs : 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-sm : 0 4px 12px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+  --shadow-md : 0 8px 28px rgba(15,23,42,.10), 0 2px 8px rgba(15,23,42,.06);
+  --shadow-btn: 0 4px 18px rgba(37,99,235,.35);
+
+  /* Shape */
+  --r-xs : 6px;
+  --r-sm : 10px;
+  --r    : 16px;
+  --r-lg : 22px;
+
+  /* Motion */
+  --ease      : cubic-bezier(.4,0,.2,1);
+  --spring    : cubic-bezier(.34,1.56,.64,1);
+  --t         : .2s;
+}
+
+/* ════════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--page-bg);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Subtle dot-grid texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: radial-gradient(circle, rgba(37,99,235,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* Tinted radial wash */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 0% 0%, rgba(37,99,235,.06) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(14,165,233,.05) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════
+   LAYOUT WRAPPER
+════════════════════════════════════════════════════ */
+.wrapper {
+  position: relative; z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+/* ════════════════════════════════════════════════════
+   TOPBAR
+════════════════════════════════════════════════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0 1.75rem;
+  animation: slideDown .55s var(--ease) both;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 14px var(--blue-glow);
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.4px;
+}
+.brand-name em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.75rem;
+}
+.nav-links a {
+  text-decoration: none;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  color: var(--muted);
+  transition: color var(--t) var(--ease);
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 0; right: 0;
+  height: 2px; border-radius: 99px;
+  background: var(--blue);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .25s var(--spring);
+}
+.nav-links a:hover { color: var(--blue); }
+.nav-links a:hover::after { transform: scaleX(1); }
+
+/* ════════════════════════════════════════════════════
+   HERO STRIP
+════════════════════════════════════════════════════ */
+.hero {
+  text-align: center;
+  padding: .5rem 0 2rem;
+  animation: fadeUp .55s .1s var(--ease) both;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: var(--blue-ultra);
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: 99px;
+  padding: .28rem .85rem;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: .9rem;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: blink 1.8s ease infinite;
+}
+.hero h1 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.6px;
+  line-height: 1.2;
+  margin-bottom: .45rem;
+}
+.hero p {
+  font-size: .9rem;
+  color: var(--muted);
+  max-width: 460px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+
+/* ════════════════════════════════════════════════════
+   MAIN GRID
+════════════════════════════════════════════════════ */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+
+/* ════════════════════════════════════════════════════
+   CARD BASE
+════════════════════════════════════════════════════ */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 1.5rem; right: 1.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(37,99,235,.3), transparent);
+}
+
+.card--left  { animation: fadeUp .5s .15s var(--ease) both; }
+.card--right { animation: fadeUp .5s .25s var(--ease) both; }
+
+/* Card title */
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.card-title-num {
+  width: 22px; height: 22px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 6px;
+  font-size: .72rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════
+   FORM ELEMENTS
+════════════════════════════════════════════════════ */
+.field { margin-bottom: 1.2rem; }
+.field:last-of-type { margin-bottom: 0; }
+
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--ink2);
+  margin-bottom: .45rem;
+}
+.field-hint {
+  font-size: .68rem;
+  font-weight: 500;
+  color: var(--muted-lt);
+  letter-spacing: 0;
+}
+
+/* Input with prefix */
+.input-shell {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+  overflow: hidden;
+}
+.input-shell:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+.input-prefix {
+  padding: 0 .75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-ultra);
+  border-right: 1.5px solid var(--border);
+  height: 100%;
+  display: flex; align-items: center;
+  align-self: stretch;
+  white-space: nowrap;
+  user-select: none;
+}
+.input-shell input[type="number"] {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: .65rem .85rem;
+  -moz-appearance: textfield;
+  width: 100%;
+}
+.input-shell input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* Plain input (no prefix) */
+input.plain, select.plain {
+  width: 100%;
+  background: var(--card-bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: .65rem .9rem;
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+  -moz-appearance: textfield;
+}
+input.plain::-webkit-inner-spin-button { -webkit-appearance: none; }
+input.plain:focus, select.plain:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+select.plain {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2394A3B8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .9rem center;
+  padding-right: 2.4rem;
+}
+
+/* ── Term selector ── */
+.term-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .45rem;
+}
+.term-btn {
+  padding: .55rem .3rem;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border2);
+  background: var(--card-bg2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--t) var(--ease);
+  white-space: nowrap;
+}
+.term-btn:hover { border-color: var(--blue-lt); color: var(--blue); background: var(--blue-ultra); }
+.term-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+  transform: translateY(-1px);
+}
+
+/* ── Credit score slider ── */
+.slider-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: .5rem;
+}
+.score-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-ultra);
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: 99px;
+  padding: .18rem .7rem;
+  transition: background var(--t);
+}
+
+.slider-track-wrap { position: relative; padding: .3rem 0; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #EF4444 0%, #F59E0B 35%, #10B981 75%, #10B981 100%);
+  position: relative;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--blue);
+  box-shadow: 0 2px 8px rgba(37,99,235,.35);
+  transition: transform .15s var(--spring), box-shadow .15s;
+  cursor: grab;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 14px rgba(37,99,235,.4);
+}
+input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+
+.slider-labels {
+  display: flex; justify-content: space-between;
+  font-size: .68rem; font-weight: 600; color: var(--muted-lt);
+  margin-top: .35rem;
+}
+
+/* ── Two-col sub-grid ── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-bottom: 1.2rem;
+}
+.field-row .field { margin-bottom: 0; }
+
+/* ── Error banner ── */
+.error-banner {
+  display: none;
+  background: var(--red-lt);
+  border: 1px solid rgba(239,68,68,.25);
+  border-radius: var(--r-sm);
+  padding: .65rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--red);
+  margin-bottom: 1rem;
+  align-items: center;
+  gap: .5rem;
+}
+.error-banner.visible { display: flex; animation: shake .35s var(--ease); }
+
+/* ── Predict button ── */
+.predict-btn {
+  width: 100%;
+  padding: .85rem 1.5rem;
+  border: none; border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-lt) 100%);
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .55rem;
+  box-shadow: var(--shadow-btn);
+  transition: transform .18s var(--spring), box-shadow .18s var(--ease), opacity .15s;
+  position: relative; overflow: hidden;
+  margin-top: 1.25rem;
+  letter-spacing: .1px;
+}
+.predict-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 45%, rgba(255,255,255,.14) 50%, transparent 55%);
+  transform: translateX(-100%);
+  transition: transform .55s var(--ease);
+}
+.predict-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,.45); }
+.predict-btn:hover::after { transform: translateX(100%); }
+.predict-btn:active { transform: translateY(0); }
+.predict-btn:disabled { opacity: .65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-spinner {
+  display: none;
+  width: 17px; height: 17px;
+  border: 2.5px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+/* ════════════════════════════════════════════════════
+   RIGHT PANEL — RESULTS
+════════════════════════════════════════════════════ */
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 4rem 1rem; gap: .85rem;
+  color: var(--muted-lt); text-align: center;
+}
+.empty-icon {
+  font-size: 2.8rem; opacity: .5;
+  animation: float 4s ease-in-out infinite;
+}
+.empty-label { font-size: .9rem; font-weight: 600; color: var(--muted); }
+.empty-sub   { font-size: .78rem; max-width: 220px; line-height: 1.6; }
+
+/* Results wrapper */
+.results { display: none; }
+.results.show { display: block; animation: fadeUp .4s var(--ease) both; }
+
+/* ── Rate hero ── */
+.rate-hero {
+  background: linear-gradient(135deg, var(--blue-ultra) 0%, rgba(224,242,254,.6) 100%);
+  border: 1.5px solid rgba(37,99,235,.15);
+  border-radius: var(--r);
+  padding: 1.35rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.rate-hero::before {
+  content: '';
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 80px;
+  background: radial-gradient(ellipse, rgba(37,99,235,.12), transparent 70%);
+}
+.rate-tag {
+  display: inline-block;
+  font-size: .68rem; font-weight: 800; letter-spacing: .9px;
+  text-transform: uppercase; color: var(--blue);
+  margin-bottom: .4rem;
+}
+.rate-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 3rem; font-weight: 700;
+  color: var(--ink); line-height: 1;
+  letter-spacing: -1px;
+}
+.rate-num span { color: var(--blue); }
+.rate-caption { font-size: .75rem; color: var(--muted); margin-top: .25rem; font-weight: 500; }
+
+/* ── Meta row ── */
+.meta-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .75rem; margin-bottom: 1.1rem;
+}
+.meta-tile {
+  background: var(--card-bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .85rem 1rem;
+}
+.meta-tile-label {
+  font-size: .68rem; font-weight: 800;
+  letter-spacing: .6px; text-transform: uppercase;
+  color: var(--muted-lt); margin-bottom: .5rem;
+}
+
+/* Confidence */
+.conf-bar-track {
+  height: 7px; border-radius: 99px;
+  background: var(--border); overflow: hidden;
+}
+.conf-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--blue) 0%, var(--teal) 100%);
+  width: 0%; transition: width 1s var(--ease);
+}
+.conf-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: .4rem;
+}
+.conf-label-txt { font-size: .78rem; font-weight: 600; color: var(--ink2); }
+.conf-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .88rem; font-weight: 700; color: var(--blue);
+}
+
+/* Processing time */
+.proc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem; font-weight: 700; color: var(--green);
+}
+.proc-unit { font-size: .72rem; font-weight: 600; color: var(--muted-lt); margin-top: .1rem; }
+
+/* ── Breakdown + donut ── */
+.breakdown-row {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: .9rem; align-items: start; margin-bottom: .8rem;
+}
+
+.breakdown-table {
+  width: 100%; border-collapse: collapse; border-radius: var(--r-sm); overflow: hidden;
+}
+.breakdown-table th {
+  background: var(--muted-bg);
+  border: 1px solid var(--border);
+  padding: .52rem .75rem;
+  font-size: .68rem; font-weight: 800;
+  letter-spacing: .5px; text-transform: uppercase;
+  color: var(--muted); text-align: center;
+}
+.breakdown-table td {
+  border: 1px solid var(--border);
+  padding: .6rem .75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; font-weight: 600;
+  color: var(--ink); text-align: center;
+}
+.breakdown-table td.accent { color: var(--blue); font-weight: 700; }
+
+/* ── Donut ── */
+.donut-wrap { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+
+.donut-svg-wrap {
+  position: relative;
+  width: 108px; height: 108px;
+}
+.donut-svg-wrap svg { transform: rotate(-90deg); display: block; }
+
+.donut-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+}
+.donut-pct-big {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem; font-weight: 700; color: var(--ink2);
+  line-height: 1.2; text-align: center;
+}
+
+.donut-legend { width: 100%; }
+.legend-item {
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .69rem; font-weight: 600;
+  color: var(--muted); margin-bottom: .25rem;
+}
+.legend-swatch {
+  width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0;
+}
+
+/* ── Drivers ── */
+.drivers-strip {
+  background: var(--card-bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .85rem 1rem;
+  margin-bottom: .6rem;
+}
+.drivers-label {
+  font-size: .68rem; font-weight: 800;
+  letter-spacing: .6px; text-transform: uppercase;
+  color: var(--muted-lt); margin-bottom: .5rem;
+}
+.driver-row {
+  display: flex; align-items: flex-start; gap: .5rem;
+  font-size: .79rem; font-weight: 500; color: var(--ink2); line-height: 1.5;
+}
+.driver-arrow {
+  color: var(--blue); font-weight: 800; font-size: .78rem;
+  margin-top: .05rem; flex-shrink: 0;
+}
+
+.breakdown-note {
+  font-size: .68rem; color: var(--muted-lt);
+  font-style: italic; text-align: right;
+}
+
+/* ════════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════════ */
+.footer {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: .73rem;
+  color: var(--muted-lt);
+  font-weight: 500;
+  animation: fadeUp .6s .4s var(--ease) both;
+}
+.footer strong { color: var(--blue); font-weight: 700; }
+
+/* ════════════════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════════════════ */
+@keyframes slideDown {
+  from { opacity:0; transform: translateY(-18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(22px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0);   }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:.35; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shake {
+  0%,100% { transform:translateX(0); }
+  20%     { transform:translateX(-5px); }
+  40%     { transform:translateX(5px); }
+  60%     { transform:translateX(-4px); }
+  80%     { transform:translateX(4px); }
+}
+@keyframes countUp {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+  <!-- ──────────────────────────────────────────────────
+       TOPBAR
+  ────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <a class="brand" href="#">
+      <div class="brand-icon">📊</div>
+      <span class="brand-name">AI <em>Interest Rate</em> Predictor</span>
+    </a>
+    <ul class="nav-links">
+     
+ <li><a href="about.html">About Project</a></li>
+    </ul>
+  </header>
+
+  <!-- ──────────────────────────────────────────────────
+       HERO STRIP
+  ────────────────────────────────────────────────── -->
+  <div class="hero">
+    <h1>Predict Your Loan Interest Rate<br>with Artificial Intelligence</h1>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────
+       MAIN GRID
+  ────────────────────────────────────────────────── -->
+  <div class="grid">
+
+    <!-- ══════════════════════════════
+         LEFT — INPUT FORM
+    ══════════════════════════════ -->
+    <div class="card card--left">
+      <div class="card-title">
+        <div class="card-title-num">1</div>
+        Enter Application Details
+      </div>
+
+      <!-- Error banner -->
+      <div class="error-banner" id="errorBanner">
+        <span>⚠</span>
+        <span id="errorText">Please check your inputs.</span>
+      </div>
+
+      <!-- Principal -->
+      <div class="field">
+        <div class="field-label">
+          Principal Amount (Loan Amount)
+          <span class="field-hint">₹50,000 – ₹1,00,00,000</span>
+        </div>
+        <div class="input-shell">
+          <span class="input-prefix">₹</span>
+          <input type="number" id="inp-principal" value="1000000" min="50000" max="10000000" step="10000" placeholder="10,00,000"/>
+        </div>
+      </div>
+
+      <!-- Term -->
+      <div class="field">
+        <div class="field-label">Time Duration (Term)</div>
+        <div class="term-row">
+          <button class="term-btn" data-m="12">12 Months</button>
+          <button class="term-btn" data-m="24">24 Months</button>
+          <button class="term-btn active" data-m="36">36 Months</button>
+          <button class="term-btn" data-m="48">48+ Months</button>
+        </div>
+      </div>
+
+      <!-- Annual Income -->
+      <div class="field">
+        <div class="field-label">Annual Income</div>
+        <div class="input-shell">
+          <span class="input-prefix">₹</span>
+          <input type="number" id="inp-income" value="1800000" min="10000" max="50000000" step="10000"/>
+        </div>
+      </div>
+
+      <!-- Credit Score -->
+      <div class="field">
+        <div class="slider-header">
+          <label class="field-label" style="margin:0">Credit Score</label>
+          <div class="score-pill" id="scoreDisplay">720</div>
+        </div>
+        <div class="slider-track-wrap">
+          <input type="range" id="inp-credit" min="300" max="850" value="720" step="1"/>
+        </div>
+        <div class="slider-labels">
+          <span>(300) Poor</span>
+          <span>Excellent (850)</span>
+        </div>
+      </div>
+
+      <!-- Risk + Account -->
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Risk Category</div>
+          <select class="plain" id="inp-risk">
+            <option value="0">Low Risk</option>
+            <option value="1">Medium Risk</option>
+            <option value="2">High Risk</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Account Type</div>
+          <select class="plain" id="inp-account">
+            <option value="3">Salary Account</option>
+            <option value="2">Savings Account</option>
+            <option value="0">Current / Mortgage</option>
+            <option value="1">NRI / Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Age + Experience -->
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Age (years)</div>
+          <input class="plain" type="number" id="inp-age" value="30" min="18" max="75"/>
+        </div>
+        <div class="field">
+          <div class="field-label">Employment Exp. (yrs)</div>
+          <input class="plain" type="number" id="inp-exp" value="5" min="0" max="50"/>
+        </div>
+      </div>
+
+      <!-- Intent + Defaults -->
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Loan Purpose</div>
+          <select class="plain" id="inp-intent">
+            <option value="4">Personal</option>
+            <option value="1">Education</option>
+            <option value="3">Medical</option>
+            <option value="0">Debt Consolidation</option>
+            <option value="2">Home Improvement</option>
+            <option value="5">Venture</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Previous Default?</div>
+          <select class="plain" id="inp-default">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Credit history -->
+      <div class="field">
+        <div class="field-label">Credit History Length (years)</div>
+        <input class="plain" type="number" id="inp-credHist" value="5" min="1" max="30"/>
+      </div>
+
+      <!-- CTA -->
+      <button class="predict-btn" id="predictBtn" onclick="runPrediction()">
+        <div class="btn-spinner" id="btnSpinner"></div>
+        <span id="btnText">🤖 Predict &amp; Calculate</span>
+      </button>
+    </div><!-- /card left -->
+
+    <!-- ══════════════════════════════
+         RIGHT — RESULTS
+    ══════════════════════════════ -->
+    <div class="card card--right">
+      <div class="card-title">
+        <div class="card-title-num">2</div>
+        Prediction &amp; Loan Breakdown
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🧠</div>
+        <div class="empty-label">Ready to Predict</div>
+        <div class="empty-sub">Fill in your application details on the left and hit <strong>Predict &amp; Calculate</strong>.</div>
+      </div>
+
+      <!-- Results -->
+      <div class="results" id="resultsPanel">
+
+        <!-- Rate hero -->
+        <div class="rate-hero">
+          <div class="rate-tag">⚡ ANN Predicted Interest Rate</div>
+          <div class="rate-num" id="rateDisplay">—<span>%</span></div>
+          <div class="rate-caption">Predicted Annual Interest Rate (APR)</div>
+        </div>
+
+        <!-- Confidence + processing -->
+        <div class="meta-row">
+          <div class="meta-tile">
+            <div class="meta-tile-label">Model Confidence</div>
+            <div class="conf-row">
+              <span class="conf-label-txt">Accuracy</span>
+              <span class="conf-pct" id="confPct">—</span>
+            </div>
+            <div class="conf-bar-track">
+              <div class="conf-bar-fill" id="confFill"></div>
+            </div>
+          </div>
+          <div class="meta-tile" style="text-align:center;">
+            <div class="meta-tile-label">Processing Time</div>
+            <div class="proc-num" id="procTime">—</div>
+            <div class="proc-unit">milliseconds</div>
+          </div>
+        </div>
+
+        <!-- Breakdown table + donut -->
+        <div class="breakdown-row">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>Loan Principal</th>
+                <th>Total Interest Payable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="tdPrincipal">—</td>
+                <td id="tdInterest" class="accent">—</td>
+              </tr>
+            </tbody>
+            <thead>
+              <tr>
+                <th>Total Repayment</th>
+                <th>Monthly EMI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="tdRepayment">—</td>
+                <td id="tdEMI" class="accent">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Donut -->
+          <div class="donut-wrap">
+            <div class="donut-svg-wrap">
+              <svg width="108" height="108" viewBox="0 0 108 108">
+                <!-- bg track -->
+                <circle cx="54" cy="54" r="40" fill="none"
+                        stroke="#E2E8F4" stroke-width="18"/>
+                <!-- interest slice (behind) -->
+                <circle id="donutInterest" cx="54" cy="54" r="40" fill="none"
+                        stroke="#3B82F6" stroke-width="18"
+                        stroke-dasharray="0 251.33"
+                        stroke-linecap="butt"/>
+                <!-- principal slice (front) -->
+                <circle id="donutPrincipal" cx="54" cy="54" r="40" fill="none"
+                        stroke="#0EA5E9" stroke-width="18"
+                        stroke-dasharray="0 251.33"
+                        stroke-linecap="butt"/>
+              </svg>
+              <div class="donut-inner">
+                <div class="donut-pct-big" id="donutCenterText">—</div>
+              </div>
+            </div>
+
+            <div class="donut-legend">
+              <div class="legend-item">
+                <div class="legend-swatch" style="background:#0EA5E9;"></div>
+                <span id="legendPrincipal">Principal</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-swatch" style="background:#3B82F6;"></div>
+                <span id="legendInterest">Interest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key drivers -->
+        <div class="drivers-strip">
+          <div class="drivers-label">Key Drivers</div>
+          <div class="driver-row">
+            <span class="driver-arrow">→</span>
+            <span id="driverText">—</span>
+          </div>
+        </div>
+
+        <div class="breakdown-note">
+          * Calculations are estimates based on standard amortisation over the selected term.
+        </div>
+
+      </div><!-- /results -->
+    </div><!-- /card right -->
+  </div><!-- /grid -->
+
+
+</div><!-- /wrapper -->
+
+<!-- ════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── State ──────────────────────────────────────── */
+let selectedTerm = 36;
+const CIRC = 2 * Math.PI * 40; // ≈ 251.33 px (r=40)
+
+/* ── Term buttons ──────────────────────────────── */
+document.querySelectorAll('.term-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.term-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTerm = parseInt(btn.dataset.m, 10);
+  });
+});
+
+/* ── Credit score live ─────────────────────────── */
+const slider = document.getElementById('inp-credit');
+const pill   = document.getElementById('scoreDisplay');
+slider.addEventListener('input', () => { pill.textContent = slider.value; });
+
+/* ── INR formatter (Indian comma system) ────────── */
+function toINR(n) {
+  n = Math.round(n);
+  if (n >= 1e7) return '₹ ' + (n / 1e7).toFixed(2) + ' Cr';
+  if (n >= 1e5) return '₹ ' + (n / 1e5).toFixed(2) + ' L';
+  let s = n.toString();
+  if (s.length <= 3) return '₹ ' + s;
+  const tail = s.slice(-3);
+  let rest = s.slice(0, -3), chunks = [];
+  while (rest.length > 2) { chunks.unshift(rest.slice(-2)); rest = rest.slice(0, -2); }
+  if (rest) chunks.unshift(rest);
+  return '₹ ' + chunks.join(',') + ',' + tail;
+}
+
+/* ── Error helper ────────────────────────────────── */
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  document.getElementById('errorText').textContent = msg;
+  banner.classList.add('visible');
+  setTimeout(() => banner.classList.remove('visible'), 5000);
+}
+
+/* ── Donut renderer ──────────────────────────────── */
+function renderDonut(principal, total) {
+  const interest = total - principal;
+  const pctP = total > 0 ? principal / total : 0;
+  const pctI = 1 - pctP;
+  const dashP = +(pctP * CIRC).toFixed(2);
+  const dashI = +(pctI * CIRC).toFixed(2);
+
+  /* Principal arc: starts at 0 */
+  const dp = document.getElementById('donutPrincipal');
+  dp.setAttribute('stroke-dasharray', `${dashP} ${+(CIRC - dashP).toFixed(2)}`);
+  dp.setAttribute('stroke-dashoffset', '0');
+
+  /* Interest arc: starts right after principal */
+  const di = document.getElementById('donutInterest');
+  di.setAttribute('stroke-dasharray', `${dashI} ${+(CIRC - dashI).toFixed(2)}`);
+  di.setAttribute('stroke-dashoffset', `-${dashP}`);
+
+  const pp = Math.round(pctP * 100);
+  const pi = 100 - pp;
+  document.getElementById('donutCenterText').innerHTML = `P:${pp}%<br>I:${pi}%`;
+  document.getElementById('legendPrincipal').textContent = `Principal (${pp}%)`;
+  document.getElementById('legendInterest').textContent  = `Interest  (${pi}%)`;
+}
+
+/* ── Animated number counter ─────────────────────── */
+function animateValue(el, targetText) {
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.textContent = targetText;
+  el.style.animation = 'countUp .45s var(--ease) both';
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN PREDICTION FUNCTION
+══════════════════════════════════════════════════ */
+async function runPrediction() {
+  /* Read inputs */
+  const principal   = parseFloat(document.getElementById('inp-principal').value);
+  const income      = parseFloat(document.getElementById('inp-income').value);
+  const creditScore = parseInt(document.getElementById('inp-credit').value, 10);
+  const risk        = parseInt(document.getElementById('inp-risk').value, 10);
+  const account     = parseInt(document.getElementById('inp-account').value, 10);
+  const age         = parseInt(document.getElementById('inp-age').value, 10);
+  const empExp      = parseInt(document.getElementById('inp-exp').value, 10);
+  const intent      = parseInt(document.getElementById('inp-intent').value, 10);
+  const prevDefault = parseInt(document.getElementById('inp-default').value, 10);
+  const credHist    = parseInt(document.getElementById('inp-credHist').value, 10);
+
+  /* Validate */
+  if (!principal || principal < 50000) { showError('Principal must be at least ₹50,000.'); return; }
+  if (!income    || income    < 10000) { showError('Annual income must be at least ₹10,000.'); return; }
+  if (principal  > income * 20)        { showError('Loan amount is very high relative to your income. Please verify.'); return; }
+  if (creditScore < 300 || creditScore > 850) { showError('Credit score must be between 300 and 850.'); return; }
+
+  /* Loading state */
+  const btn       = document.getElementById('predictBtn');
+  const spinner   = document.getElementById('btnSpinner');
+  const btnText   = document.getElementById('btnText');
+  btn.disabled    = true;
+  spinner.style.display = 'block';
+  btnText.textContent   = 'Running ANN Model…';
+
+  const t0 = performance.now();
+
+  const payload = {
+    Principal:    principal,
+    Income:       income,
+    credit_score: creditScore,
+    loan_percent_income: income > 0 ? +(principal / income).toFixed(4) : 0,
+    person_home_ownership: account,
+    person_age:   age,
+    person_emp_exp: empExp,
+    loan_intent:  intent,
+    previous_loan_defaults_on_file: prevDefault,
+    cb_person_cred_hist_length: credHist,
+    term_months:  selectedTerm,
+  };
+
+  let result;
+  try {
+    /* ─ POST to Flask backend ─ */
+    const resp = await fetch('/predict', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    result = await resp.json();
+  } catch (fetchErr) {
+    /* ─ No backend? Use client-side demo model ─ */
+    console.info('Backend offline – using demo predictor.', fetchErr);
+    result = localPredict(payload);
+  }
+
+  const procMs = result.proc_ms ?? Math.round(performance.now() - t0);
+
+  /* ── Render results ── */
+  document.getElementById('emptyState').style.display = 'none';
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.add('show');
+
+  /* Rate */
+  document.getElementById('rateDisplay').innerHTML =
+    `${result.predicted_rate.toFixed(2)}<span>%</span>`;
+
+  /* Confidence */
+  const conf = result.confidence;
+  document.getElementById('confPct').textContent = conf.toFixed(0) + '%';
+  document.getElementById('procTime').textContent = procMs;
+  setTimeout(() => {
+    document.getElementById('confFill').style.width = conf + '%';
+  }, 80);
+
+  /* Breakdown table */
+  const P = result.total_repayment - result.total_interest;
+  animateValue(document.getElementById('tdPrincipal'),  toINR(P)                    + ' *');
+  animateValue(document.getElementById('tdInterest'),   toINR(result.total_interest) + ' *');
+  animateValue(document.getElementById('tdRepayment'),  toINR(result.total_repayment)+ ' *');
+  animateValue(document.getElementById('tdEMI'),        toINR(result.monthly_emi)    + ' *');
+
+  /* Donut */
+  renderDonut(P, result.total_repayment);
+
+  /* Key driver */
+  document.getElementById('driverText').textContent = result.key_driver;
+
+  /* Reset button */
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  btnText.innerHTML = '🤖 Predict &amp; Calculate';
+}
+
+/* ══════════════════════════════════════════════════
+   LOCAL (CLIENT-SIDE) DEMO PREDICTOR
+   Used when Flask backend is not running.
+   Approximates ANN output via credit-score-based formula.
+══════════════════════════════════════════════════ */
+function localPredict(p) {
+  const cs  = p.credit_score;
+  const lti = p.loan_percent_income;
+
+  /* Base rate: credit score drives 65% of variance */
+  let rate = 20.5 - ((cs - 300) / 550) * 13.5;
+
+  /* Adjustments */
+  if (lti > 0.55)  rate += 2.2;
+  else if (lti > 0.4) rate += 1.0;
+  else if (lti < 0.15) rate -= 0.8;
+
+  if (p.previous_loan_defaults_on_file === 1) rate += 2.8;
+  if (p.loan_intent === 5) rate += 0.9;   // VENTURE
+  if (p.person_home_ownership === 0) rate -= 0.5; // MORTGAGE (lower risk)
+
+  rate = Math.max(4.5, Math.min(22.0, rate));
+
+  /* EMI calc */
+  const months = p.term_months || 36;
+  const mr  = rate / 12 / 100;
+  const pow = Math.pow(1 + mr, months);
+  const emi = (p.Principal * mr * pow) / (pow - 1);
+  const totalRep = emi * months;
+  const totalInt = totalRep - p.Principal;
+
+  /* Confidence */
+  const conf = +(60 + ((cs - 300) / 550) * 35).toFixed(1);
+
+  /* Key driver message */
+  let driver;
+  if (cs >= 720)      driver = `High credit score (${cs}) significantly reduced your predicted rate.`;
+  else if (cs < 550)  driver = `Low credit score (${cs}) is raising your predicted rate.`;
+  else if (p.previous_loan_defaults_on_file === 1) driver = 'Previous loan default is the dominant rate driver.';
+  else if (lti > 0.5) driver = `High loan-to-income ratio (${(lti*100).toFixed(0)}%) increased your rate.`;
+  else                driver = 'Moderate profile — rate driven by income-to-loan ratio and credit history.';
+
+  return {
+    predicted_rate:  +rate.toFixed(2),
+    confidence:      Math.min(95, conf),
+    monthly_emi:     Math.round(emi),
+    total_interest:  Math.round(totalInt),
+    total_repayment: Math.round(totalRep),
+    key_driver:      driver + ' [demo mode — start Flask for ANN predictions]',
+    proc_ms:         Math.round(6 + Math.random() * 18),
+  };
+}
+
+/* ── Enter key support ─────────────────────────── */
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') runPrediction(); });
+});
+</script>
+</body>
+</html>

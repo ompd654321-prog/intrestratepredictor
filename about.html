@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>About — AI Interest Rate Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #F0F4FA;
+  color: #0F172A;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  background: #fff;
+  border: 1px solid #E2E8F4;
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(15,23,42,.08);
+  text-align: center;
+}
+
+.accent-bar {
+  width: 48px;
+  height: 4px;
+  background: linear-gradient(90deg, #2563EB, #0EA5E9);
+  border-radius: 99px;
+  margin: 0 auto 1.8rem;
+}
+
+.logo { font-size: 2rem; margin-bottom: .6rem; }
+
+h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -.3px;
+  margin-bottom: .5rem;
+}
+
+.tagline {
+  font-size: .85rem;
+  color: #64748B;
+  line-height: 1.7;
+  margin-bottom: 1.8rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #E2E8F4;
+  margin: 0 0 1.8rem;
+}
+
+.about-text {
+  font-size: .87rem;
+  color: #475569;
+  line-height: 1.8;
+  margin-bottom: 1.8rem;
+}
+
+.team-label {
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #94A3B8;
+  margin-bottom: 1rem;
+}
+
+.names-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-bottom: 2rem;
+}
+
+.names-list li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  font-size: .92rem;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  color: #2563EB;
+  background: #EFF4FF;
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: 99px;
+  padding: .14rem .52rem;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #2563EB;
+  text-decoration: none;
+  border: 1px solid rgba(37,99,235,.25);
+  border-radius: 99px;
+  padding: .4rem 1.1rem;
+  transition: background .18s, color .18s;
+}
+.back-link:hover { background: #2563EB; color: #fff; }
+
+.footer-note {
+  margin-top: 1.5rem;
+  font-size: .72rem;
+  color: #94A3B8;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="accent-bar"></div>
+
+  <h1>AI Interest Rate Predictor</h1>
+  <p class="tagline">
+    A machine learning project that predicts loan interest rates<br>
+    using an Artificial Neural Network trained on real lending data.
+  </p>
+
+  <hr/>
+
+  <p class="about-text">
+    This project uses a Feed-Forward Neural Network (ANN) built with Python
+    and scikit-learn. It takes loan details like principal amount, income, and
+    credit score as input and predicts the annual interest rate (APR) along
+    with EMI and full repayment breakdown.
+  </p>
+
+  <hr/>
+
+  <div class="team-label">Designed &amp; Developed By</div>
+
+  <ul class="names-list">
+    <li><span class="num">01</span> Sudhanshu Atalkar</li>
+    <li><span class="num">02</span> Prathamesh Ade</li>
+    <li><span class="num">03</span> Om Awatirak</li>
+    <li><span class="num">04</span> Krushna Gawali</li>
+  </ul>
+
+  <a class="back-link" href="index.html">← Back to Predictor</a>
+
+</div>
+</body>
+</html>
